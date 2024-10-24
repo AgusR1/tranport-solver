@@ -1,4 +1,4 @@
-import { TeamOutlined } from "@ant-design/icons";
+import { TruckOutlined } from "@ant-design/icons";
 import { Flex, Layout, Space, theme } from "antd";
 import React from "react";
 import Title from "antd/es/typography/Title";
@@ -22,7 +22,7 @@ const MainLayout: React.FC<Props> = ({ children }) => {
 			<Header style={{ padding: 0, background: colorPrimary }}>
 				<Flex style={boxStyle} align="center" justify="space-evenly">
 					<Space.Compact style={{ paddingLeft: "20px" }} direction="vertical">
-						<TeamOutlined
+						<TruckOutlined
 							style={{
 								fontSize: "40px",
 								color: secondaryColor,

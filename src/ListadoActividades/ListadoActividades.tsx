@@ -1,18 +1,17 @@
 import React, { useRef, useState } from "react";
 import type { TableColumnsType, TableProps } from "antd";
-import { Button, Space, Table, Tag, Tooltip } from "antd";
+import { Breadcrumb, Button, Space, Table, Tooltip } from "antd";
 import Search, { SearchProps } from "antd/es/input/Search";
 import {
-	EditOutlined,
-	LockOutlined,
+	HomeOutlined,
 	ReadOutlined,
 	ReloadOutlined,
 	SearchOutlined,
-	UnlockOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { fontFamily, secondaryColor } from "../general/constants";
 import { Actividad } from "./types";
+import MainLayout from "../general/MainLayout";
 
 type OnChange = NonNullable<TableProps<Actividad>["onChange"]>;
 type Filters = Parameters<OnChange>[1];
@@ -21,11 +20,8 @@ type GetSingle<T> = T extends (infer U)[] ? U : never;
 type Sorts = GetSingle<Parameters<OnChange>[2]>;
 
 const ListadoActividades: React.FC = () => {
-	const [open, setOpen] = useState<boolean>(false);
 	const añadirItemRef = useRef<HTMLButtonElement>(null);
 	const [loading, setLoading] = useState<boolean>(true);
-	const [isEdit, setIsEdit] = useState<boolean>(false);
-	const [actividad, setActividad] = useState<Partial<Actividad> | null>(null);
 	const navigate = useNavigate();
 
 	const [filteredInfo, setFilteredInfo] = useState<Filters>({});
@@ -44,107 +40,41 @@ const ListadoActividades: React.FC = () => {
 	const onSearch: SearchProps["onSearch"] = (value, _e, info) =>
 		console.log(info?.source, value);
 
-	const handleOpenModalCreaActividad = () => {
-		setOpen(true);
-		setIsEdit(false);
-		setActividad(null);
-	};
-
 	const columns: TableColumnsType<Actividad> = [
 		{
-			title: "Nombre",
-			dataIndex: "nombre",
-			key: "nombre",
+			title: "Descripcion",
+			dataIndex: "descripcion",
+			key: "descripcion",
 			filteredValue: filteredInfo.name || null,
 			sorter: (a, b) => {
-				const displayNameA = a?.nombre ?? ""; // Si a.user o a.user.displayName son null o undefined, se asigna una cadena vacía
-				const displayNameB = b?.nombre ?? ""; // Lo mismo para b.user.displayName
-				return displayNameA.length - displayNameB.length;
-			},
-			sortOrder: sortedInfo.columnKey === "nombre" ? sortedInfo.order : null,
-			ellipsis: true,
-		},
-		{
-			title: "Tipo de actividad",
-			dataIndex: "tipoActividad",
-			key: "tipoActividad",
-			filteredValue: filteredInfo.name || null,
-			sorter: (a, b) => {
-				const displayNameA = a?.tipoActividad ?? ""; // Si a.user o a.user.displayName son null o undefined, se asigna una cadena vacía
-				const displayNameB = b?.tipoActividad ?? ""; // Lo mismo para b.user.displayName
+				const displayNameA = a?.descripcion ?? ""; // Si a.user o a.user.displayName son null o undefined, se asigna una cadena vacía
+				const displayNameB = b?.descripcion ?? ""; // Lo mismo para b.user.displayName
 				return displayNameA.length - displayNameB.length;
 			},
 			sortOrder:
-				sortedInfo.columnKey === "tipoActividad" ? sortedInfo.order : null,
+				sortedInfo.columnKey === "descripcion" ? sortedInfo.order : null,
 			ellipsis: true,
-			render: (_, { tipoActividad }) => {
-				return getTipoActividadNombre(tipoActividad);
-			},
 		},
 		{
-			title: "Estado",
-			dataIndex: "abierta",
-			key: "abierta",
+			title: "Nro. Depositos",
+			dataIndex: "nroFuentes",
+			key: "nroFuentes",
 			filteredValue: filteredInfo.name || null,
 			ellipsis: true,
-			render: (_, { abierta }) => {
-				return abierta ? (
-					<Tag
-						style={{
-							fontFamily: fontFamily,
-							fontSize: "1em",
-							padding: "4px",
-						}}
-						icon={<UnlockOutlined />}
-						color="#4cd411"
-					>
-						Abierta
-					</Tag>
-				) : (
-					<Tag
-						style={{
-							fontFamily: fontFamily,
-							fontSize: "1em",
-							padding: "4px",
-						}}
-						icon={<LockOutlined />}
-						color="#ee4452"
-					>
-						Cerrada
-					</Tag>
-				);
-			},
 		},
 		{
 			title: "Action",
 			key: "action",
-			render: (
-				_: any,
-				{
-					id,
-					abierta,
-					nombre,
-					tipoActividad,
-					problemaTransporteInfo,
-					salaId,
-				}: Actividad
-			) => {
+			render: () => {
 				return (
 					<Space size="middle">
 						<Tooltip title="Ver actividad">
 							<Button
 								onClick={() => {
-									navigate(`/salas/${salaId}/actividad/${id}`);
+									navigate("");
 								}}
 								shape="circle"
 								icon={<SearchOutlined />}
-							/>
-						</Tooltip>
-						<Tooltip title="Renombrar actividad">
-							<Button
-								onClick={() => {}}
-								shape="circle"
-								icon={<EditOutlined />}
 							/>
 						</Tooltip>
 					</Space>
@@ -160,50 +90,59 @@ const ListadoActividades: React.FC = () => {
 	};
 
 	return (
-		<>
-			<Space style={{ marginBottom: 16 }}>
-				<Search
-					placeholder="input search text"
-					onSearch={onSearch}
-					enterButton
-					style={{ fontFamily: fontFamily }}
+		<MainLayout>
+			<>
+				<Breadcrumb
+					style={{
+						paddingTop: "0.5em",
+						paddingBottom: "0.5em",
+						fontFamily: "Josefin Sans",
+					}}
+					items={[
+						{
+							path: "/",
+							title: (
+								<>
+									<HomeOutlined />
+									<span>Menu principal</span>
+								</>
+							),
+						},
+					]}
 				/>
-				{sala?.ownerId === user?.uid && (
+				<Space style={{ marginBottom: 16 }}>
+					<Search
+						placeholder="input search text"
+						onSearch={onSearch}
+						enterButton
+						style={{ fontFamily: fontFamily }}
+					/>
 					<Button
 						style={{ fontFamily: fontFamily, color: secondaryColor }}
 						type="primary"
 						ref={añadirItemRef}
 						icon={<ReadOutlined />}
-						onClick={handleOpenModalCreaActividad}
+						onClick={() => {}}
 					>
 						{`Crear una actividad`}
 					</Button>
-				)}
 
-				<Button
-					onClick={() => {
-						handleRefresh();
-					}}
-					shape="round"
-					icon={<ReloadOutlined />}
+					<Button
+						onClick={() => {
+							handleRefresh();
+						}}
+						shape="round"
+						icon={<ReloadOutlined />}
+					/>
+				</Space>
+				<Table
+					loading={loading}
+					columns={columns}
+					dataSource={data}
+					onChange={handleChange}
 				/>
-			</Space>
-			<Table
-				loading={loading}
-				columns={columns}
-				dataSource={data}
-				onChange={handleChange}
-			/>
-			{open && (
-				<ModalActividad
-					setOpen={setOpen}
-					open={open}
-					isEdit={isEdit}
-					actividad={actividad}
-					fetchData={fetchData}
-				/>
-			)}
-		</>
+			</>
+		</MainLayout>
 	);
 };
 
