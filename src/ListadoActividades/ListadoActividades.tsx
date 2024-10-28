@@ -1,94 +1,44 @@
-import React, { useRef, useState } from "react";
-import type { TableColumnsType, TableProps } from "antd";
-import { Breadcrumb, Button, Space, Table, Tooltip } from "antd";
-import Search, { SearchProps } from "antd/es/input/Search";
-import {
-	HomeOutlined,
-	ReadOutlined,
-	ReloadOutlined,
-	SearchOutlined,
-} from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
-import { fontFamily, secondaryColor } from "../general/constants";
-import { Actividad } from "./types";
+import React, { useState } from "react";
+import { Breadcrumb, Button, message, Steps, theme } from "antd";
+import { HomeOutlined } from "@ant-design/icons";
 import MainLayout from "../general/MainLayout";
+const steps = [
+	{
+		title: "Definir matriz",
+		content: "First-content",
+	},
+	{
+		title: "Ingresar valores",
+		content: "Second-content",
+	},
+	{
+		title: "Resultados",
+		content: "Last-content",
+	},
+];
+const StepperActividad: React.FC = () => {
+	const { token } = theme.useToken();
+	const [current, setCurrent] = useState(0);
 
-type OnChange = NonNullable<TableProps<Actividad>["onChange"]>;
-type Filters = Parameters<OnChange>[1];
-
-type GetSingle<T> = T extends (infer U)[] ? U : never;
-type Sorts = GetSingle<Parameters<OnChange>[2]>;
-
-const ListadoActividades: React.FC = () => {
-	const añadirItemRef = useRef<HTMLButtonElement>(null);
-	const [loading, setLoading] = useState<boolean>(true);
-	const navigate = useNavigate();
-
-	const [filteredInfo, setFilteredInfo] = useState<Filters>({});
-	const [sortedInfo, setSortedInfo] = useState<Sorts>({});
-
-	const [data, setData] = useState<Actividad[]>([]);
-
-	const fetchData = async () => {};
-
-	const handleChange: OnChange = (pagination, filters, sorter) => {
-		console.log("Various parameters", pagination, filters, sorter);
-		setFilteredInfo(filters);
-		setSortedInfo(sorter as Sorts);
+	const next = () => {
+		setCurrent(current + 1);
 	};
 
-	const onSearch: SearchProps["onSearch"] = (value, _e, info) =>
-		console.log(info?.source, value);
-
-	const columns: TableColumnsType<Actividad> = [
-		{
-			title: "Descripcion",
-			dataIndex: "descripcion",
-			key: "descripcion",
-			filteredValue: filteredInfo.name || null,
-			sorter: (a, b) => {
-				const displayNameA = a?.descripcion ?? ""; // Si a.user o a.user.displayName son null o undefined, se asigna una cadena vacía
-				const displayNameB = b?.descripcion ?? ""; // Lo mismo para b.user.displayName
-				return displayNameA.length - displayNameB.length;
-			},
-			sortOrder:
-				sortedInfo.columnKey === "descripcion" ? sortedInfo.order : null,
-			ellipsis: true,
-		},
-		{
-			title: "Nro. Depositos",
-			dataIndex: "nroFuentes",
-			key: "nroFuentes",
-			filteredValue: filteredInfo.name || null,
-			ellipsis: true,
-		},
-		{
-			title: "Action",
-			key: "action",
-			render: () => {
-				return (
-					<Space size="middle">
-						<Tooltip title="Ver actividad">
-							<Button
-								onClick={() => {
-									navigate("");
-								}}
-								shape="circle"
-								icon={<SearchOutlined />}
-							/>
-						</Tooltip>
-					</Space>
-				);
-			},
-		},
-	];
-
-	const handleRefresh = () => {
-		setData([]);
-		setLoading(true);
-		fetchData();
+	const prev = () => {
+		setCurrent(current - 1);
 	};
 
+	const items = steps.map((item) => ({ key: item.title, title: item.title }));
+
+	const contentStyle: React.CSSProperties = {
+		lineHeight: "260px",
+		textAlign: "center",
+		color: token.colorTextTertiary,
+		backgroundColor: token.colorFillAlter,
+		borderRadius: token.borderRadiusLG,
+		border: `1px dashed ${token.colorBorder}`,
+		marginTop: 16,
+	};
 	return (
 		<MainLayout>
 			<>
@@ -110,40 +60,31 @@ const ListadoActividades: React.FC = () => {
 						},
 					]}
 				/>
-				<Space style={{ marginBottom: 16 }}>
-					<Search
-						placeholder="input search text"
-						onSearch={onSearch}
-						enterButton
-						style={{ fontFamily: fontFamily }}
-					/>
-					<Button
-						style={{ fontFamily: fontFamily, color: secondaryColor }}
-						type="primary"
-						ref={añadirItemRef}
-						icon={<ReadOutlined />}
-						onClick={() => {}}
-					>
-						{`Crear una actividad`}
-					</Button>
-
-					<Button
-						onClick={() => {
-							handleRefresh();
-						}}
-						shape="round"
-						icon={<ReloadOutlined />}
-					/>
-				</Space>
-				<Table
-					loading={loading}
-					columns={columns}
-					dataSource={data}
-					onChange={handleChange}
-				/>
+				<Steps current={current} items={items} />
+				<div style={contentStyle}>{steps[current].content}</div>
+				<div style={{ marginTop: 24 }}>
+					{current < steps.length - 1 && (
+						<Button type="primary" onClick={() => next()}>
+							Next
+						</Button>
+					)}
+					{current === steps.length - 1 && (
+						<Button
+							type="primary"
+							onClick={() => message.success("Processing complete!")}
+						>
+							Done
+						</Button>
+					)}
+					{current > 0 && (
+						<Button style={{ margin: "0 8px" }} onClick={() => prev()}>
+							Previous
+						</Button>
+					)}
+				</div>
 			</>
 		</MainLayout>
 	);
 };
 
-export default ListadoActividades;
+export default StepperActividad;
