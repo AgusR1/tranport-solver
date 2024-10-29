@@ -2,20 +2,8 @@ import React, { useState } from "react";
 import { Breadcrumb, Button, message, Steps, theme } from "antd";
 import { HomeOutlined } from "@ant-design/icons";
 import MainLayout from "../general/MainLayout";
-const steps = [
-	{
-		title: "Definir matriz",
-		content: "First-content",
-	},
-	{
-		title: "Ingresar valores",
-		content: "Second-content",
-	},
-	{
-		title: "Resultados",
-		content: "Last-content",
-	},
-];
+import FormCreacionMatriz from "../FormCreacionMatriz/FormCreacionMatriz";
+
 const StepperActividad: React.FC = () => {
 	const { token } = theme.useToken();
 	const [current, setCurrent] = useState(0);
@@ -27,7 +15,20 @@ const StepperActividad: React.FC = () => {
 	const prev = () => {
 		setCurrent(current - 1);
 	};
-
+	const steps = [
+		{
+			title: "Definir matriz",
+			content: <FormCreacionMatriz />,
+		},
+		{
+			title: "Ingresar valores",
+			content: "Second-content",
+		},
+		{
+			title: "Resultados",
+			content: "Last-content",
+		},
+	];
 	const items = steps.map((item) => ({ key: item.title, title: item.title }));
 
 	const contentStyle: React.CSSProperties = {
@@ -65,7 +66,7 @@ const StepperActividad: React.FC = () => {
 				<div style={{ marginTop: 24 }}>
 					{current < steps.length - 1 && (
 						<Button type="primary" onClick={() => next()}>
-							Next
+							Siguiente
 						</Button>
 					)}
 					{current === steps.length - 1 && (
@@ -73,12 +74,12 @@ const StepperActividad: React.FC = () => {
 							type="primary"
 							onClick={() => message.success("Processing complete!")}
 						>
-							Done
+							Hecho
 						</Button>
 					)}
 					{current > 0 && (
 						<Button style={{ margin: "0 8px" }} onClick={() => prev()}>
-							Previous
+							Anterior
 						</Button>
 					)}
 				</div>
