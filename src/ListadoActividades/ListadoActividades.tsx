@@ -7,6 +7,10 @@ import FormCreacionMatriz from "../FormCreacionMatriz/FormCreacionMatriz";
 const StepperActividad: React.FC = () => {
 	const { token } = theme.useToken();
 	const [current, setCurrent] = useState(0);
+	const [valuesForm, setValuesForm] = useState({
+		nroDestinos: 0,
+		nroFuentes: 0,
+	});
 
 	const next = () => {
 		setCurrent(current + 1);
@@ -18,7 +22,12 @@ const StepperActividad: React.FC = () => {
 	const steps = [
 		{
 			title: "Definir matriz",
-			content: <FormCreacionMatriz />,
+			content: (
+				<FormCreacionMatriz
+					setValuesForm={setValuesForm}
+					valuesForm={valuesForm}
+				/>
+			),
 		},
 		{
 			title: "Ingresar valores",
