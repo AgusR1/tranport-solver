@@ -2,7 +2,7 @@ import { Col, Form, InputNumber, Row, Space } from "antd";
 import { Controller, useForm } from "react-hook-form";
 import { fontFamily } from "../general/constants";
 import { EnvironmentOutlined, TruckOutlined } from "@ant-design/icons";
-import React from "react";
+import React, { useEffect } from "react";
 
 interface Props {
 	setValuesForm: React.Dispatch<
@@ -21,7 +21,7 @@ const FormCreacionMatriz: React.FC<Props> = ({
 	setValuesForm,
 	valuesForm: { nroDestinos, nroFuentes },
 }) => {
-	const { control, handleSubmit, getValues } = useForm<{
+	const { control, watch } = useForm<{
 		nroDestinos: number;
 		nroFuentes: number;
 	}>({
@@ -31,16 +31,18 @@ const FormCreacionMatriz: React.FC<Props> = ({
 		},
 	});
 
-	const onFormChange = () => {
-		const nroFuentes = getValues("nroFuentes");
-		const nroDestinos = getValues("nroDestinos");
+	const watchNroDestinos = watch("nroDestinos");
+	const watchNroFuentes = watch("nroFuentes");
+
+	useEffect(() => {
 		setValuesForm({
-			nroDestinos: nroDestinos,
-			nroFuentes: nroFuentes,
+			nroDestinos: watchNroDestinos,
+			nroFuentes: watchNroFuentes,
 		});
-	};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [watchNroDestinos, watchNroFuentes]);
 	return (
-		<form onSubmit={handleSubmit(onFormChange)}>
+		<form>
 			<Space
 				direction="vertical"
 				size="middle"

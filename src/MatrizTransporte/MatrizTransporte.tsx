@@ -1,4 +1,4 @@
-import { Card, Input, InputRef, Select, Space } from "antd";
+import { Button, Card, Input, InputRef, Select, Space } from "antd";
 import React, { useRef, useState } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import {
@@ -108,6 +108,7 @@ const MatrizTransporte: React.FC<Props> = ({
 	const inputsRefOferta = useRef<(InputRef | null)[]>([]);
 	const inputsRefDepositos = useRef<(InputRef | null)[]>([]);
 	const inputsRefDestinos = useRef<(InputRef | null)[]>([]);
+	const [expanded, setExpanded] = useState<boolean>(false);
 	const [selectedAlgorithm, setSelectedAlgorithm] = useState<
 		"costo_minimo" | "esquina_noroeste" | "vogel"
 	>("costo_minimo");
@@ -182,7 +183,15 @@ const MatrizTransporte: React.FC<Props> = ({
 	};
 
 	return (
-		<Card title="Matriz de transporte" size="small">
+		<Card
+			title="Matriz de transporte"
+			extra={
+				<Button onClick={() => setExpanded(!expanded)} type="link">
+					Expandir
+				</Button>
+			}
+			size="small"
+		>
 			<form
 				style={{
 					display: "flex",
@@ -192,7 +201,11 @@ const MatrizTransporte: React.FC<Props> = ({
 				onSubmit={handleSubmit(onSubmit)}
 			>
 				<Table
-					style={{ maxWidth: "80%", marginLeft: "auto", marginRight: "auto" }}
+					style={{
+						maxWidth: expanded ? "100%" : "80%",
+						marginLeft: expanded ? undefined : "auto",
+						marginRight: expanded ? undefined : "auto",
+					}}
 				>
 					<thead>
 						<tr>

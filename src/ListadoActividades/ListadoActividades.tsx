@@ -3,10 +3,12 @@ import { Breadcrumb, Button, message, Steps, theme } from "antd";
 import { HomeOutlined } from "@ant-design/icons";
 import MainLayout from "../general/MainLayout";
 import FormCreacionMatriz from "../FormCreacionMatriz/FormCreacionMatriz";
+import MatrizTransporte from "../MatrizTransporte/MatrizTransporte";
 
 const StepperActividad: React.FC = () => {
 	const { token } = theme.useToken();
 	const [current, setCurrent] = useState(0);
+	const [result, setResult] = useState<string[]>([]);
 	const [valuesForm, setValuesForm] = useState({
 		nroDestinos: 0,
 		nroFuentes: 0,
@@ -31,7 +33,13 @@ const StepperActividad: React.FC = () => {
 		},
 		{
 			title: "Ingresar valores",
-			content: "Second-content",
+			content: (
+				<MatrizTransporte
+					nroDestinos={valuesForm.nroFuentes}
+					nroFuentes={valuesForm.nroDestinos}
+					setResult={setResult}
+				/>
+			),
 		},
 		{
 			title: "Resultados",
