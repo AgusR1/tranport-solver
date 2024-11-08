@@ -1,26 +1,22 @@
 import React, { useState } from "react";
-import { Breadcrumb, Button, message, Steps, theme } from "antd";
+import { Breadcrumb, Steps, theme } from "antd";
 import { HomeOutlined } from "@ant-design/icons";
 import MainLayout from "../general/MainLayout";
 import FormCreacionMatriz from "../FormCreacionMatriz/FormCreacionMatriz";
 import MatrizTransporte from "../MatrizTransporte/MatrizTransporte";
+import StepperSlider from "./StepperSlider";
+import { useSteps } from "../hooks/useSteps";
 
 const StepperActividad: React.FC = () => {
 	const { token } = theme.useToken();
-	const [current, setCurrent] = useState(0);
+	const { current } = useSteps();
+
 	const [result, setResult] = useState<string[]>([]);
 	const [valuesForm, setValuesForm] = useState({
 		nroDestinos: 0,
 		nroFuentes: 0,
 	});
 
-	const next = () => {
-		setCurrent(current + 1);
-	};
-
-	const prev = () => {
-		setCurrent(current - 1);
-	};
 	const steps = [
 		{
 			title: "Definir matriz",
@@ -81,24 +77,7 @@ const StepperActividad: React.FC = () => {
 				<Steps current={current} items={items} />
 				<div style={contentStyle}>{steps[current].content}</div>
 				<div style={{ marginTop: 24 }}>
-					{current < steps.length - 1 && (
-						<Button type="primary" onClick={() => next()}>
-							Siguiente
-						</Button>
-					)}
-					{current === steps.length - 1 && (
-						<Button
-							type="primary"
-							onClick={() => message.success("Processing complete!")}
-						>
-							Hecho
-						</Button>
-					)}
-					{current > 0 && (
-						<Button style={{ margin: "0 8px" }} onClick={() => prev()}>
-							Anterior
-						</Button>
-					)}
+					<StepperSlider stepsLength={steps.length} />
 				</div>
 			</>
 		</MainLayout>
