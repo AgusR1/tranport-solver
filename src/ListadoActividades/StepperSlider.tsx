@@ -1,30 +1,33 @@
 import { Button, message } from "antd";
 import React from "react";
-import { useSteps } from "../hooks/useSteps";
+import { useStepper } from "../hooks/useStepper";
+import { StepperSliderProps } from "./types";
 
-interface Props {
-	stepsLength: number;
-}
+const StepperSlider: React.FC<StepperSliderProps> = ({
+	stepsLength,
+	onComplete,
+}) => {
+	const { current, next, prev } = useStepper();
 
-const StepperSlider: React.FC<Props> = ({ stepsLength }) => {
-	const { current, prev, next } = useSteps();
+	const handleComplete = () => {
+		message.success("Processing complete!");
+		onComplete?.();
+	};
+
 	return (
 		<>
 			{current < stepsLength - 1 && (
-				<Button type="primary" onClick={() => next()}>
+				<Button type="primary" onClick={next}>
 					Siguiente
 				</Button>
 			)}
 			{current === stepsLength - 1 && (
-				<Button
-					type="primary"
-					onClick={() => message.success("Processing complete!")}
-				>
+				<Button type="primary" onClick={handleComplete}>
 					Hecho
 				</Button>
 			)}
 			{current > 0 && (
-				<Button style={{ margin: "0 8px" }} onClick={() => prev()}>
+				<Button style={{ margin: "0 8px" }} onClick={prev}>
 					Anterior
 				</Button>
 			)}

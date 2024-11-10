@@ -3,10 +3,10 @@ import {
 	FileTextOutlined,
 	TruckOutlined,
 } from "@ant-design/icons";
-import { Tag } from "antd";
+import { InputRef, Tag } from "antd";
 import { fontFamily } from "../general/constants";
-import { Timestamp } from "firebase/firestore";
-import { FormValues } from "./MatrizTransporte";
+import { FormValues } from "./types";
+import { MutableRefObject } from "react";
 
 export const getTipoActividadNombre = (tipoId: string) => {
 	switch (tipoId) {
@@ -55,23 +55,6 @@ export const getTipoActividadNombre = (tipoId: string) => {
 	}
 };
 
-export const convertFirestoreTimestampToDate = (
-	firestoreTimestamp: Timestamp
-): string => {
-	// Extract seconds and nanoseconds from the Firestore Timestamp
-	const seconds = firestoreTimestamp.seconds;
-	const nanoseconds = firestoreTimestamp.nanoseconds;
-
-	// Convert seconds and nanoseconds to milliseconds
-	const milliseconds = seconds * 1000 + nanoseconds / 1e6;
-
-	// Create a Date object
-	const date = new Date(milliseconds);
-	const formattedDate = date.toLocaleString("es-AR");
-
-	return formattedDate;
-};
-
 export const generateMatrix = (
 	rows: number,
 	columns: number
@@ -113,7 +96,7 @@ export const costoMin = (
 	depositosNombres: string[],
 	destinosNombres: string[]
 ) => {
-	let logs: string[] = [];
+	const logs: string[] = [];
 	let costoTotal = 0;
 	// Calcula la suma de ofertas y demandas
 	const sumaOfertas = ofertas.reduce((acc, curr) => acc + curr, 0);
@@ -180,7 +163,7 @@ export const esquinaNoroeste = (
 	depositosNombres: string[],
 	destinosNombres: string[]
 ) => {
-	let logs: string[] = [];
+	const logs: string[] = [];
 	let costoTotal = 0;
 	// Calcula la suma de ofertas y demandas
 	const sumaOfertas = ofertas.reduce((acc, curr) => acc + curr, 0);
@@ -282,4 +265,70 @@ export const vogel = (
 	let penalizacionesCol = penalizacionesPorColumna(matrizCostos);
 	console.log("penalizaciones filas: " + penalizacionesRow);
 	console.log("penalizaciones columnas: " + penalizacionesCol);
+};
+
+export const getResult = (
+	selectedAlgorithm: "costo_minimo" | "esquina_noroeste" | "vogel",
+	data: FormValues,
+	demandas: number[],
+	ofertas: number[],
+	depositosNombres: string[],
+	destinosNombres: string[]
+) => {
+	switch (selectedAlgorithm) {
+		case "costo_minimo":
+			return costoMin(
+				convertToNumberMatrix(data),
+				demandas,
+				ofertas,
+				depositosNombres,
+				destinosNombres
+			);
+		case "esquina_noroeste":
+			return esquinaNoroeste(
+				convertToNumberMatrix(data),
+				demandas,
+				ofertas,
+				depositosNombres,
+				destinosNombres
+			);
+		case "vogel":
+			return vogel(
+				convertToNumberMatrix(data),
+				demandas,
+				ofertas,
+				depositosNombres,
+				destinosNombres
+			);
+		default:
+			return costoMin(
+				convertToNumberMatrix(data),
+				demandas,
+				ofertas,
+				depositosNombres,
+				destinosNombres
+			);
+	}
+};
+
+export const getField = (inputsRefs: {
+	demandas: MutableRefObject<(InputRef | null)[]>;
+	ofertas: MutableRefObject<(InputRef | null)[]>;
+	depositos: MutableRefObject<(InputRef | null)[]>;
+	destinos: MutableRefObject<(InputRef | null)[]>;
+}) => {
+	return {
+		demandas: inputsRefs.demandas.current.map((input) =>
+			parseInt(input?.input?.value || "0")
+		),
+		ofertas: inputsRefs.ofertas.current.map((input) =>
+			parseInt(input?.input?.value || "0")
+		),
+		depositosNombres: inputsRefs.depositos.current.map(
+			(input) => input?.input?.value || ""
+		),
+		destinosNombres: inputsRefs.destinos.current.map(
+			(input) => input?.input?.value || ""
+		),
+	};
 };

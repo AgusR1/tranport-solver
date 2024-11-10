@@ -4,3 +4,7 @@ export type Actividad = {
 	nroFuentes: number;
 	nroDestinos: number;
 };
+interface StepperSliderProps {
+	stepsLength: number;
+	onComplete?: () => void;
+}
