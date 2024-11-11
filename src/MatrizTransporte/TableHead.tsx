@@ -1,11 +1,10 @@
 import { useContext } from "react";
 import { Sth, ThFD, UnstyledInput } from "./TableComponents";
 import { StepperContext } from "../context/StepperContext";
-import { Props } from "./types";
 
-const TableHead: React.FC<Props> = ({ inputsRefDestinos }) => {
-	const { valuesForm } = useContext(StepperContext) ?? {};
-	if (valuesForm === undefined) {
+const TableHead: React.FC = () => {
+	const { valuesForm, inputsRefs } = useContext(StepperContext) ?? {};
+	if (valuesForm === undefined || !inputsRefs) {
 		throw new Error("TableHead debe estar dentro de un AppProvider");
 	}
 	return (
@@ -17,7 +16,7 @@ const TableHead: React.FC<Props> = ({ inputsRefDestinos }) => {
 						<UnstyledInput
 							defaultValue={`Destino ${index + 1}`}
 							placeholder="Nombre del destino"
-							ref={(el) => (inputsRefDestinos.current[index] = el)}
+							ref={(el) => (inputsRefs.destinos.current[index] = el)}
 						/>
 					</Sth>
 				))}

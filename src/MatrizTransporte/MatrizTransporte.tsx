@@ -1,54 +1,15 @@
 import { Button, Card, Space } from "antd";
-import React, { useContext, useState } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
-import { generateMatrix, getField, getResult } from "./helpers";
-import { FormValues } from "./types";
-import SelectAlgorithm from "./SelectAlogirthm";
-import { StepperContext } from "../context/StepperContext";
+import React, { useState } from "react";
 import TableMatriz from "./TableMatriz";
+import SelectAlgorithm from "./SelectAlogirthm";
+import { useMatrizTransporte } from "../hooks/useMatrizTransporte";
 
 const MatrizTransporte: React.FC = () => {
-	const { valuesForm, setValuesForm, inputsRefs } =
-		useContext(StepperContext) ?? {};
-	if (
-		valuesForm === undefined ||
-		setValuesForm === undefined ||
-		inputsRefs === undefined
-	) {
-		throw new Error("TableHead debe estar dentro de un AppProvider");
-	}
-
 	const [expanded, setExpanded] = useState<boolean>(false);
 	const [selectedAlgorithm, setSelectedAlgorithm] = useState<
 		"costo_minimo" | "esquina_noroeste" | "vogel"
 	>("costo_minimo");
-	const { control, handleSubmit } = useForm<FormValues>({
-		defaultValues: {
-			matrix: generateMatrix(valuesForm.nroFuentes, valuesForm.nroDestinos),
-		},
-	});
-
-	useFieldArray({
-		control,
-		name: "matrix",
-	});
-
-	const onSubmit = (data: FormValues) => {
-		const { demandas, ofertas, depositosNombres, destinosNombres } =
-			getField(inputsRefs);
-		setValuesForm((prevValues) => ({
-			...prevValues,
-			result:
-				getResult(
-					selectedAlgorithm,
-					data,
-					demandas,
-					ofertas,
-					depositosNombres,
-					destinosNombres
-				) ?? [],
-		}));
-	};
+	const { formMethods, onSubmit } = useMatrizTransporte();
 
 	return (
 		<Card
@@ -61,14 +22,11 @@ const MatrizTransporte: React.FC = () => {
 			size="small"
 		>
 			<form
-				style={{
-					display: "flex",
-					justifyContent: "center",
-					flexDirection: "column",
-				}}
-				onSubmit={handleSubmit(onSubmit)}
+				onSubmit={formMethods.handleSubmit((data) =>
+					onSubmit(data, selectedAlgorithm)
+				)}
 			>
-				<TableMatriz expanded={expanded} control={control} />
+				<TableMatriz expanded={expanded} control={formMethods.control} />
 				<Space
 					style={{ marginTop: "1em", marginLeft: "auto", marginRight: "auto" }}
 				>

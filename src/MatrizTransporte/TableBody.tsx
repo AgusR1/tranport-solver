@@ -10,13 +10,9 @@ import { PropsBody } from "./types";
 import { useContext } from "react";
 import { StepperContext } from "../context/StepperContext";
 
-const TableBody: React.FC<PropsBody> = ({
-	control,
-	inputsRefDepositos,
-	inputsRefOferta,
-}) => {
-	const { valuesForm } = useContext(StepperContext) ?? {};
-	if (valuesForm === undefined) {
+const TableBody: React.FC<PropsBody> = ({ control }) => {
+	const { valuesForm, inputsRefs } = useContext(StepperContext) ?? {};
+	if (valuesForm === undefined || !inputsRefs) {
 		throw new Error("TableHead debe estar dentro de un AppProvider");
 	}
 	return (
@@ -30,7 +26,7 @@ const TableBody: React.FC<PropsBody> = ({
 								name={"Fuente" + colIndex}
 								defaultValue={`Deposito ${colIndex + 1}`}
 								placeholder="Deposito"
-								ref={(el) => (inputsRefDepositos.current[colIndex] = el)}
+								ref={(el) => (inputsRefs.depositos.current[colIndex] = el)}
 							/>
 						</Sth>
 						{[...Array(valuesForm.nroDestinos)].map((_e, rowIndex) => {
@@ -50,7 +46,7 @@ const TableBody: React.FC<PropsBody> = ({
 							<UnstyledInput
 								key={uuidv4()}
 								id={"Oferta" + colIndex}
-								ref={(el) => (inputsRefOferta.current[colIndex] = el)}
+								ref={(el) => (inputsRefs.ofertas.current[colIndex] = el)}
 								name={"Oferta" + colIndex}
 								defaultValue={"0"}
 							/>
