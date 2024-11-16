@@ -6,7 +6,13 @@ import {
 import { InputRef, Tag } from "antd";
 import { fontFamily } from "../general/constants";
 import { FormValues } from "./types";
-import { MutableRefObject } from "react";
+import { CSSProperties, MutableRefObject } from "react";
+
+export const formStyle: CSSProperties = {
+	display: "flex",
+	justifyContent: "center",
+	flexDirection: "column",
+};
 
 export const getTipoActividadNombre = (tipoId: string) => {
 	switch (tipoId) {
@@ -252,7 +258,7 @@ export const vogel = (
 	depositosNombres: string[],
 	destinosNombres: string[]
 ) => {
-	let logs: string[] = [];
+	const logs: string[] = [];
 	let costoTotal = 0;
 	// Calcula la suma de ofertas y demandas
 	const sumaOfertas = ofertas.reduce((acc, curr) => acc + curr, 0);

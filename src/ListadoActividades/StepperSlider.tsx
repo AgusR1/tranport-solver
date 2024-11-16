@@ -6,6 +6,7 @@ import { StepperSliderProps } from "./types";
 const StepperSlider: React.FC<StepperSliderProps> = ({
 	stepsLength,
 	onComplete,
+	onNext,
 }) => {
 	const { current, next, prev } = useStepper();
 
@@ -14,10 +15,17 @@ const StepperSlider: React.FC<StepperSliderProps> = ({
 		onComplete?.();
 	};
 
+	const handleNext = async () => {
+		const canProceed = onNext ? await onNext() : true;
+		if (!canProceed) return;
+
+		next?.();
+	};
+
 	return (
 		<>
 			{current < stepsLength - 1 && (
-				<Button type="primary" onClick={next}>
+				<Button type="primary" onClick={handleNext}>
 					Siguiente
 				</Button>
 			)}

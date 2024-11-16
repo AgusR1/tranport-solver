@@ -7,4 +7,5 @@ export type Actividad = {
 interface StepperSliderProps {
 	stepsLength: number;
 	onComplete?: () => void;
+	onNext?: () => boolean | Promise<boolean>;
 }
