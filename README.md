@@ -1,69 +1,92 @@
-# React + TypeScript + Vite
+# Transport Solver (React + TypeScript + Vite)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicación web para modelar y resolver el Problema de Transporte (Optimización) de forma interactiva. Permite:
+- Definir orígenes (depósitos) y destinos, con sus ofertas y demandas.
+- Ingresar la matriz de costos.
+- Seleccionar el algoritmo de resolución.
+- Ver las asignaciones óptimas y el costo mínimo total, junto con el detalle de los pasos.
 
-Currently, two official plugins are available:
+Esta app está construida con React, TypeScript, Vite, Ant Design y gestión de estado con MobX.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Demo local rápida
 
-## Expanding the ESLint configuration
+1) Requisitos
+- Node.js 18+ (recomendado 20+)
+- npm 9+
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+2) Instalación y ejecución
+- Instalar dependencias: `npm install`
+- Levantar en desarrollo: `npm run dev`
+- Abrir el enlace que imprime Vite (por defecto: http://localhost:5173)
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+3) Build y preview
+- Build producción: `npm run build`
+- Servir build: `npm run preview`
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+4) Linter (opcional)
+- `npm run lint`
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Uso básico
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+1. Define el número de depósitos y destinos, así como sus nombres (opcional), ofertas y demandas.
+2. Completa la matriz de costos unitarios de transporte.
+3. Selecciona el algoritmo en el selector disponible.
+4. Ejecuta y visualiza:
+   - Asignaciones finales (depósito → destino → cantidad).
+   - Costo total mínimo.
+   - Pasos/bitácora del algoritmo (para entender cómo se llegó a la solución).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Estructura del proyecto (resumen)
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- `src/`
+  - `components/`
+    - `matrizCostos/`
+      - `MatrizCostos.tsx` y subcomponentes/hooks para definir la matriz de costos, ofertas y demandas.
+      - `hooks/useMatrizColumns.ts`
+      - `components/DemandaSummary.tsx`
+    - `algoritmoSelector/AlgoritmoSelector.tsx` para elegir el método de resolución.
+    - `ResultadoFinal/ResultadoFinal.tsx` muestra asignaciones, costo mínimo y logs.
+  - `App.tsx` punto de composición de la UI.
+  - `store/` (por ejemplo `problema.store.ts`) con el estado del problema (ofertas, demandas, costos, resultados, logs, etc.).
+
+## Tecnologías
+
+- React 19 + TypeScript
+- Vite 7
+- Ant Design 5
+- MobX (mobx-react-lite)
+
+## Scripts disponibles
+
+- `npm run dev`: Compila TypeScript y levanta Vite en modo desarrollo.
+- `npm run build`: Compila el proyecto (TypeScript + Vite) para producción en `dist/`.
+- `npm run preview`: Sirve el build de producción localmente.
+- `npm run lint`: Ejecuta ESLint (configuración base incluida).
+
+## Convenciones y notas
+
+- Tipado estricto en TS recomendado (ver tsconfig).*  
+- La UI utiliza componentes de Ant Design.
+- La gestión de estado se realiza con MobX; los componentes observables usan `observer`.
+- Si cambias nombres de depósitos/destinos, la tabla de resultados los reflejará automáticamente.
+
+## Roadmap (ideas)
+
+- Soporte para múltiples algoritmos (p. ej., método de la esquina noroeste, Voguel, MODI). 
+- Exportación de resultados (CSV/Excel) y reporte de pasos.
+- Tests unitarios y de integración.
+- Validaciones avanzadas (casos balanceados/no balanceados).
+
+## Contribución
+
+Las contribuciones son bienvenidas. Sugerido:
+- Abrir un issue describiendo la mejora/bug.
+- Crear un branch desde `main` y enviar un Pull Request con cambios pequeños y bien descritos.
+
+## Licencia
+
+Este proyecto no especifica licencia. Si deseas abrir el código, agrega una licencia (por ejemplo, MIT) en la raíz del repo.
+
+---
+
+¿Sugerencias o dudas? Abre un issue y con gusto se revisa.

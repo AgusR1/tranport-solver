@@ -12,6 +12,8 @@
   "dependencies": {
     "@ant-design/v5-patch-for-react-19": "^1.0.3",
     "antd": "^5.27.3",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^3.0.3",
     "mobx-react-lite": "^4.1.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
