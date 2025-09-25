@@ -4,10 +4,10 @@ import ConfigurarProblema from "./pages/configurarProblema/ConfigurarProblema.ts
 import ResolverProblema from "./pages/resolverProblema/ResolverProblema.tsx";
 import problemaStore from "./store/problema.store.ts";
 import {observer} from "mobx-react-lite";
-import ResultadoFinal from "./components/ResultadoFinal/ResultadoFinal.tsx";
+import Navbar from "./components/layout/Navbar.tsx";
 
-const {Header, Content} = Layout;
-const {Step} = Steps;
+const { Content } = Layout;
+const { Step } = Steps;
 
 const App = observer(() => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -16,30 +16,30 @@ const App = observer(() => {
   const prev = () => setCurrentStep((prev) => prev - 1);
 
   return (
-    <Layout style={{minHeight: "100vh"}}>
-      <Header style={{background: "#1677ff", color: "#fff", fontSize: 20, padding: "0 24px"}}>
-        Solver de Problemas de Transporte
-      </Header>
-      <Content style={{padding: 24}}>
+    <Layout style={{ minHeight: "100vh" }}>
+      <Navbar />
+      <Content style={{ padding: 16 }}>
         <Card>
-          <Steps current={currentStep} style={{marginBottom: 24}}>
-            <Step title="Configurar" description="Definir problema"/>
-            <Step title="Resolver" description="Seleccionar algoritmo y calcular"/>
-            <Step title="Resumen" description="Ver resultado final"/>
+          <Steps current={currentStep} style={{ marginBottom: 16 }}>
+            <Step title="Configurar" description="Definir problema" />
+            <Step title="Resolver" description="Seleccionar algoritmo y ver log" />
           </Steps>
 
-          {currentStep === 0 && <ConfigurarProblema/>}
-          {currentStep === 1 && <ResolverProblema/>}
-          {currentStep === 2 && <ResultadoFinal/>}
+          {currentStep === 0 && <ConfigurarProblema />}
+          {currentStep === 1 && <ResolverProblema />}
 
-          <div style={{marginTop: 24, textAlign: "right"}}>
+          <div style={{ marginTop: 16, textAlign: "right" }}>
             {currentStep > 0 && (
-              <Button style={{marginRight: 8}} onClick={prev}>
+              <Button style={{ marginRight: 8 }} onClick={prev}>
                 Anterior
               </Button>
             )}
-            {currentStep < 2 && (
-              <Button type="primary" onClick={next} disabled={currentStep === 0 && problemaStore.matriz.length === 0}>
+            {currentStep < 1 && (
+              <Button
+                type="primary"
+                onClick={next}
+                disabled={currentStep === 0 && problemaStore.matriz.length === 0}
+              >
                 Siguiente
               </Button>
             )}

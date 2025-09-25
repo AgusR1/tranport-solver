@@ -1,22 +1,40 @@
-import {Card, Radio, type RadioChangeEvent} from "antd";
+import {Card, Radio, Button, type RadioChangeEvent} from "antd";
 import {observer} from "mobx-react-lite";
 import problemaStore from "../../store/problema.store";
+import {PropsWithChildren} from "react";
 
-const AlgoritmoSelector = observer(() => {
-  const {algoritmo, setAlgoritmo, resolver} = problemaStore;
+type Props = {
+  onResolverClick?: () => void;
+};
+
+const AlgoritmoSelector = observer((props: PropsWithChildren<Props>) => {
+  const {onResolverClick} = props;
+  const {algoritmo, setAlgoritmo, matriz} = problemaStore;
 
   const handleChange = (e: RadioChangeEvent) => {
+    // Solo actualizamos el algoritmo seleccionado.
+    // La resolución debe ejecutarse explícitamente desde otra acción para evitar bucles.
     setAlgoritmo(e.target.value);
-    resolver();
   };
+
+  const canResolve = matriz.length > 0 && !!algoritmo;
 
   return (
     <Card title="Seleccionar algoritmo">
-      <Radio.Group value={algoritmo} onChange={handleChange}>
-        <Radio value="vogel">Método Vogel</Radio>
-        <Radio value="noroeste">Esquina Noroeste</Radio>
-        <Radio value="costo">Costo mínimo</Radio>
-      </Radio.Group>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+        <Radio.Group value={algoritmo} onChange={handleChange}>
+          <Radio value="vogel">Método Vogel</Radio>
+          <Radio value="noroeste">Esquina Noroeste</Radio>
+          <Radio value="costo">Costo mínimo</Radio>
+        </Radio.Group>
+        <Button
+          type="primary"
+          onClick={onResolverClick}
+          disabled={!canResolve}
+        >
+          Resolver ahora
+        </Button>
+      </div>
     </Card>
   );
 });

@@ -30,9 +30,9 @@ const ResultadoFinal: React.FC = observer(() => {
   ];
 
   return (
-    <div style={{ marginTop: 20 }}>
-      <Card>
-        <Title level={4}>Resultados del Problema</Title>
+    <div style={{ marginTop: 4 }}>
+      <Card size="small"styles={{body:{padding:8}}}>
+        <Title level={4} style={{ marginBottom: 4 }}>Resultados del Problema</Title>
         <Text strong>Costo total: </Text>
         <Text type="success">{costoMinimo}</Text>
 
@@ -40,13 +40,14 @@ const ResultadoFinal: React.FC = observer(() => {
           dataSource={asignaciones.map((a, i) => ({ ...a, key: i }))}
           columns={columns}
           pagination={false}
-          style={{ marginTop: 20 }}
+          size="small"
+          style={{ marginTop: 8 }}
         />
 
-        <Collapse accordion style={{ marginTop: 20 }}>
+        <Collapse accordion size="small" style={{ marginTop: 8 }}>
           <Panel header="Ver pasos del algoritmo" key="1">
             {logs.map((log, i) => (
-              <p key={i} style={{ marginBottom: 4 }}>
+              <p key={i} style={{ marginBottom: 2 }}>
                 {log}
               </p>
             ))}

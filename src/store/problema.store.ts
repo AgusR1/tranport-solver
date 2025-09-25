@@ -61,22 +61,37 @@ class ProblemaStore {
     const f = Math.max(0, this.fuentes ?? 0);
     const d = Math.max(0, this.destinos ?? 0);
 
-    this.matriz = Array.from({length: f}, () =>
-      Array.from({length: d}, () => 0)
+    const oldF = this.matriz?.length ?? 0;
+    const oldD = oldF > 0 ? this.matriz[0]?.length ?? 0 : 0;
+
+    // Preservar valores existentes dentro de los nuevos límites
+    const nuevaMatriz = Array.from({ length: f }, (_, i) =>
+      Array.from({ length: d }, (_, j) => (this.matriz?.[i]?.[j] ?? 0))
     );
-    this.ofertas = Array.from({length: f}, () => 0);
-    this.demandas = Array.from({length: d}, () => 0);
-    this.depositosNombres = Array.from(
-      {length: f},
-      (_, i) => `Depósito ${i + 1}`
+    const nuevasOfertas = Array.from({ length: f }, (_, i) => this.ofertas?.[i] ?? 0);
+    const nuevasDemandas = Array.from({ length: d }, (_, j) => this.demandas?.[j] ?? 0);
+
+    const nuevosDepositos = Array.from(
+      { length: f },
+      (_, i) => this.depositosNombres?.[i] ?? `Depósito ${i + 1}`
     );
-    this.destinosNombres = Array.from(
-      {length: d},
-      (_, i) => `Destino ${i + 1}`
+    const nuevosDestinos = Array.from(
+      { length: d },
+      (_, i) => this.destinosNombres?.[i] ?? `Destino ${i + 1}`
     );
-    this.logs = [];
-    this.asignaciones = [];
-    this.costoMinimo = 0;
+
+    this.matriz = nuevaMatriz;
+    this.ofertas = nuevasOfertas;
+    this.demandas = nuevasDemandas;
+    this.depositosNombres = nuevosDepositos;
+    this.destinosNombres = nuevosDestinos;
+
+    // Reiniciar resultados solo si cambió la dimensión de la matriz
+    if (oldF !== f || oldD !== d) {
+      this.logs = [];
+      this.asignaciones = [];
+      this.costoMinimo = 0;
+    }
   };
 
 
