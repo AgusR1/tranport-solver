@@ -9,6 +9,9 @@ export type UseMatrizCostosModalResult = {
     onItemHover: (logIndex: number) => void;
     onItemLeave: () => void;
     skipToEnd: () => void;
+    replay: () => void;
+    speed: number; // interval in ms
+    setSpeed: (ms: number) => void;
 };
 
 export function useMatrizCostosModal(
@@ -27,6 +30,7 @@ export function useMatrizCostosModal(
         col: number | null;
     } | undefined>();
     const timerRef = React.useRef<number | null>(null);
+    const [speed, setSpeed] = React.useState<number>(900); // ms per step
 
     const isAssignmentLog = React.useCallback((s: string) => {
         return s.includes("Se asignan") || s.includes("Seleccionamos la celda");
@@ -55,9 +59,14 @@ export function useMatrizCostosModal(
 
     const onItemHover = React.useCallback(
         (logIndex: number) => {
-            setManualHighlight(mapLogToAssignment(logIndex));
+            // Si se hace hover sobre el último item, no mostramos highlight
+            if (logIndex === logs.length - 1) {
+                setManualHighlight(undefined);
+            } else {
+                setManualHighlight(mapLogToAssignment(logIndex));
+            }
         },
-        [mapLogToAssignment]
+        [mapLogToAssignment, logs.length]
     );
 
     const onItemLeave = React.useCallback(() => setManualHighlight(undefined), []);
@@ -77,15 +86,19 @@ export function useMatrizCostosModal(
                         setActiveIndex(currentIndex);
                         setAutoHighlight(mapLogToAssignment(currentIndex));
                     }
-                    if (next === logs.length && timerRef.current) {
-                        window.clearInterval(timerRef.current);
-                        timerRef.current = null;
+                    if (next === logs.length) {
+                        // Al llegar al último paso, detenemos el timer y limpiamos el autoHighlight
+                        if (timerRef.current) {
+                            window.clearInterval(timerRef.current);
+                            timerRef.current = null;
+                        }
+                        setAutoHighlight(undefined);
                     }
                     return next;
                 });
             };
 
-            timerRef.current = window.setInterval(step, 900);
+            timerRef.current = window.setInterval(step, speed);
             setTimeout(step, 200);
         } else {
             if (timerRef.current) {
@@ -104,7 +117,7 @@ export function useMatrizCostosModal(
                 timerRef.current = null;
             }
         };
-    }, [open, logs.length, mapLogToAssignment]);
+    }, [open, logs.length, mapLogToAssignment, speed]);
 
     const skipToEnd = React.useCallback(() => {
         if (timerRef.current) {
@@ -116,6 +129,40 @@ export function useMatrizCostosModal(
         setAutoHighlight(undefined);
     }, [logs.length]);
 
+    const replay = React.useCallback(() => {
+        // Reinicia la animación desde el principio
+        if (timerRef.current) {
+            window.clearInterval(timerRef.current);
+            timerRef.current = null;
+        }
+        setVisibleCount(0);
+        setActiveIndex(null);
+        setAutoHighlight(undefined);
+        setManualHighlight(undefined);
+
+        const step = () => {
+            setVisibleCount((prev) => {
+                const next = Math.min(prev + 1, logs.length);
+                if (next > 0) {
+                    const currentIndex = next - 1;
+                    setActiveIndex(currentIndex);
+                    setAutoHighlight(mapLogToAssignment(currentIndex));
+                }
+                if (next === logs.length) {
+                    if (timerRef.current) {
+                        window.clearInterval(timerRef.current);
+                        timerRef.current = null;
+                    }
+                    setAutoHighlight(undefined);
+                }
+                return next;
+            });
+        };
+
+        timerRef.current = window.setInterval(step, speed);
+        setTimeout(step, 200);
+    }, [logs.length, mapLogToAssignment, speed]);
+
     const highlight = manualHighlight ?? autoHighlight;
 
     return {
@@ -125,5 +172,8 @@ export function useMatrizCostosModal(
         onItemHover,
         onItemLeave,
         skipToEnd,
+        replay,
+        speed,
+        setSpeed,
     };
 }

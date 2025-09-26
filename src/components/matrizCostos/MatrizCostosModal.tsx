@@ -18,7 +18,7 @@ const MatrizCostosModal: React.FC<MatrizCostosModalProps> = observer(({open, onC
 
     const {logs, asignaciones} = problemaStore;
 
-    const { visibleCount, activeIndex, highlight, onItemHover, onItemLeave, skipToEnd } = useMatrizCostosModal(
+    const { visibleCount, activeIndex, highlight, onItemHover, onItemLeave, skipToEnd, replay, speed, setSpeed } = useMatrizCostosModal(
         open,
         logs,
         asignaciones
@@ -36,11 +36,15 @@ const MatrizCostosModal: React.FC<MatrizCostosModalProps> = observer(({open, onC
             <div style={{display: "flex", flexDirection: "column", gap: 16}}>
                 <MatrizCostos readOnly highlight={highlight}/>
                 <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
-                    {visibleCount < logs.length && (
+                    <Space>
+                        <Button onClick={replay} disabled={logs.length === 0}>Reproducir</Button>
                         <Space>
-                            <Button onClick={skipToEnd}>Saltar al resultado</Button>
+                            <Button type={speed === 1400 ? "primary" : "default"} onClick={() => setSpeed(1400)}>0.5x</Button>
+                            <Button type={speed === 900 ? "primary" : "default"} onClick={() => setSpeed(900)}>1x</Button>
+                            <Button type={speed === 450 ? "primary" : "default"} onClick={() => setSpeed(450)}>2x</Button>
                         </Space>
-                    )}
+                        <Button onClick={skipToEnd} disabled={visibleCount >= logs.length}>Saltar al resultado</Button>
+                    </Space>
                 </div>
                 <div>
                     <Title level={5} style={{margin: "8px 0"}}>Log de solución</Title>
