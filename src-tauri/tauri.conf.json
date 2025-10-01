@@ -18,5 +18,25 @@
     "security": {
       "csp": null
     }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["msi", "nsis", "deb", "appimage"],
+    "identifier": "com.agusr.transport-solver",
+    "publisher": "agusr",
+    "category": "Productivity",
+    "shortDescription": "Transport problem solver application",
+    "longDescription": "A desktop application for solving transportation optimization problems using linear programming methods.",
+    "resources": [],
+    "externalBin": [],
+    "copyright": "",
+    "licenseFile": "",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
   }
 }
