@@ -1,7 +1,7 @@
 import {Card, Radio, Button, type RadioChangeEvent} from "antd";
 import {observer} from "mobx-react-lite";
 import problemaStore from "../../store/problema.store";
-import {PropsWithChildren} from "react";
+import type { PropsWithChildren } from "react";
 
 type Props = {
   onResolverClick?: () => void;
