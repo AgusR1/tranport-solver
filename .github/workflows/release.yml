@@ -1,0 +1,42 @@
+name: "Tauri Release"
+
+on:
+  push:
+    tags:
+      - "v*" # se dispara al pushear un tag, ej: v1.0.0
+
+jobs:
+  tauri:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ubuntu-latest, windows-latest]
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust
+        uses: swatinem/rust-cache@v2
+
+      - name: Install frontend dependencies
+        run: npm install
+
+      - name: Build and bundle app with Tauri
+        uses: tauri-apps/tauri-action@v0
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: "Transport Solver ${{ github.ref_name }}"
+          releaseBody: "Release generado automáticamente por GitHub Actions"
+          releaseDraft: false
+          prerelease: false
