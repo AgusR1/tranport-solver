@@ -49,14 +49,12 @@ jobs:
             libsoup2.4-dev \
             librsvg2-dev
 
-      # 5️⃣ Debug PKG_CONFIG (Linux only)
-      - name: Debug PKG_CONFIG
+      # 5️⃣ Configurar PKG_CONFIG_PATH Linux
+      - name: Set PKG_CONFIG_PATH (Linux only)
         if: matrix.platform == 'ubuntu-latest'
         run: |
-          echo "PKG_CONFIG_PATH: $PKG_CONFIG_PATH"
-          pkg-config --modversion gobject-2.0
-          pkg-config --modversion glib-2.0
-          pkg-config --modversion gio-2.0
+          echo "Exporting PKG_CONFIG_PATH..."
+          echo "/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/share/pkgconfig" >> $GITHUB_ENV
 
       # 6️⃣ Instalar dependencias frontend
       - name: Install frontend dependencies
@@ -66,9 +64,15 @@ jobs:
       - name: Build and bundle app with Tauri
         run: npm run tauri build
         env:
-          PKG_CONFIG_ALLOW_SYSTEM_CFLAGS: 1 # necesario para Linux
+          PKG_CONFIG_ALLOW_SYSTEM_CFLAGS: 1
+          PKG_CONFIG_PATH: ${{ env.PKG_CONFIG_PATH }}
 
-      # 8️⃣ Subir artifacts Windows
+      # 8️⃣ Debug artifacts Windows
+      - name: List Windows bundle
+        if: matrix.platform == 'windows-latest'
+        run: dir src-tauri\target\release\bundle\msi
+
+      # 9️⃣ Subir artifacts Windows
       - name: Upload Windows artifacts
         if: matrix.platform == 'windows-latest'
         uses: actions/upload-artifact@v3
@@ -78,7 +82,12 @@ jobs:
             src-tauri/target/release/bundle/msi/*.msi
             src-tauri/target/release/bundle/nsis/*.exe
 
-      # 9️⃣ Subir artifacts Linux
+      # 🔟 Debug artifacts Linux
+      - name: List Linux bundle
+        if: matrix.platform == 'ubuntu-latest'
+        run: ls -R src-tauri/target/release/bundle
+
+      # 1️⃣1️⃣ Subir artifacts Linux
       - name: Upload Linux artifacts
         if: matrix.platform == 'ubuntu-latest'
         uses: actions/upload-artifact@v3
