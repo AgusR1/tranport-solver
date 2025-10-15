@@ -96,7 +96,7 @@ jobs:
       # 9️⃣ Subir artifacts Windows
       - name: Upload Windows artifacts
         if: matrix.platform == 'windows-latest'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: windows-installers
           path: |
@@ -118,7 +118,7 @@ jobs:
       # 1️⃣1️⃣ Subir artifacts Linux
       - name: Upload Linux artifacts
         if: matrix.platform == 'ubuntu-latest'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: linux-installers
           path: |
