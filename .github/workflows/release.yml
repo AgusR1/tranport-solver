@@ -3,7 +3,7 @@ name: "Tauri Release"
 on:
   push:
     tags:
-      - "v*" # Se ejecuta al pushear un tag como v1.0.0
+      - "v*" # Se ejecuta al pushear un tag, ej: v1.0.0
 
 jobs:
   build:
@@ -34,7 +34,7 @@ jobs:
       - name: Cache Rust
         uses: swatinem/rust-cache@v2
 
-      # 5️⃣ Instalar dependencias específicas según plataforma
+      # 5️⃣ Dependencias específicas por sistema operativo
       - name: Install dependencies (Ubuntu)
         if: matrix.platform == 'ubuntu-latest'
         run: |
@@ -43,29 +43,41 @@ jobs:
 
       - name: Install dependencies (macOS)
         if: matrix.platform == 'macos-latest'
-        run: |
-          brew install gtk+3
+        run: brew install gtk+3
 
+      # ✅ FIX: Instalación robusta de WiX Toolset (Windows)
       - name: Install WiX Toolset (Windows)
         if: matrix.platform == 'windows-latest'
         shell: pwsh
         run: |
-          if (Get-Command candle.exe -ErrorAction SilentlyContinue) {
-            echo "✅ WiX Toolset already installed. Skipping Chocolatey installation."
-          } else {
+          echo "🔍 Checking if WiX is already installed..."
+          $wixDir = (Get-ChildItem "C:\Program Files*" -Directory -Recurse -ErrorAction SilentlyContinue | Where-Object { $_.Name -like "WiX Toolset v3.*" } | Sort-Object Name -Descending | Select-Object -First 1).FullName
+          if (-not $wixDir) {
             echo "⬇️ Installing WiX Toolset..."
-            choco install wixtoolset -y
+            choco install wixtoolset --version=3.14.1.20250415 -y
+            $wixDir = (Get-ChildItem "C:\Program Files*" -Directory -Recurse -ErrorAction SilentlyContinue | Where-Object { $_.Name -like "WiX Toolset v3.*" } | Sort-Object Name -Descending | Select-Object -First 1).FullName
+          }
+          
+          if (-not (Test-Path $wixDir)) {
+            echo "❌ WiX installation directory not found."
+            exit 1
           }
 
-          $wixDir = (Get-ChildItem "C:\Program Files (x86)" -Directory -Filter "WiX Toolset v3.*" | Sort-Object Name -Descending | Select-Object -First 1).FullName
           $wixBin = Join-Path $wixDir "bin"
+          echo "✅ WiX found at: $wixBin"
 
-          if (Test-Path $wixBin) {
-            echo "✅ WiX found at: $wixBin"
-            echo "$wixBin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          } else {
-            echo "❌ WiX Toolset not found after installation."
+          # Agregar al PATH y al entorno
+          echo "$wixBin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "WIX=$wixBin" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+          # Verificar binarios
+          echo "Checking WiX executables:"
+          Get-ChildItem $wixBin
+          if (!(Test-Path (Join-Path $wixBin "candle.exe")) -or !(Test-Path (Join-Path $wixBin "light.exe"))) {
+            echo "❌ WiX executables missing. Installation incomplete."
             exit 1
+          } else {
+            echo "✅ WiX executables verified."
           }
 
       # 6️⃣ Instalar dependencias frontend
@@ -76,15 +88,15 @@ jobs:
       - name: Build and bundle Tauri app
         run: npm run tauri build
 
-      # 8️⃣ Subir artefactos de build (instaladores, binarios, etc.)
-      - name: Upload artifacts
+      # 8️⃣ Subir artefactos (instaladores, binarios, etc.)
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: tauri-${{ matrix.platform }}
           path: |
             src-tauri/target/release/bundle/**/*
 
-  # 9️⃣ Crear Release y adjuntar instaladores
+  # 9️⃣ Crear Release y subir instaladores a GitHub
   release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
@@ -100,6 +112,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           name: Release ${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
           files: |
             dist/**/*.msi
             dist/**/*.exe
