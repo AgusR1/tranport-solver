@@ -32,22 +32,38 @@ jobs:
       - name: Cache Rust
         uses: swatinem/rust-cache@v2
 
-      # 4️⃣ Install WiX Toolset (Windows only)
+      # 4️⃣ Instalar WiX Toolset (Windows)
       - name: Install WiX Toolset (Windows only)
         if: matrix.platform == 'windows-latest'
         shell: pwsh
         run: |
-          choco upgrade wixtoolset -y
-          $wixDir = (Get-ChildItem "C:\Program Files (x86)" -Directory -Filter "WiX Toolset v3.*" | Sort-Object Name -Descending | Select-Object -First 1).FullName
-          $wixBin = Join-Path $wixDir "bin"
-          echo "WIX bin: $wixBin"
-          echo "$wixBin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          echo "WIX=$wixBin" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          choco install wixtoolset --version=3.14.0 -y
+          $wixBin = "C:\Program Files (x86)\WiX Toolset v3.14\bin"
+          if (!(Test-Path $wixBin)) {
+            $wixBin = "C:\Program Files (x86)\WiX Toolset v3.11\bin"
+          }
+          if (Test-Path $wixBin) {
+            echo "✅ WiX found at: $wixBin"
+            echo "$wixBin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+            echo "WIX=$wixBin" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          } else {
+            echo "❌ WiX Toolset not found. Check Chocolatey installation."
+            exit 1
+          }
 
+      # 5️⃣ (Opcional) Debug WiX para confirmar instalación correcta
+      - name: Debug WiX installation
+        if: matrix.platform == 'windows-latest'
+        shell: pwsh
+        run: |
+          echo "PATH:"
+          echo $env:PATH
+          echo ""
+          echo "Checking WiX executables:"
+          where candle.exe
+          where light.exe
 
-
-
-      # 7️⃣ Instalar dependencias frontend
+      # 6️⃣ Instalar dependencias frontend
       - name: Install frontend dependencies
         run: npm install
 
@@ -66,7 +82,7 @@ jobs:
             echo "Bundle directory does not exist"
           )
 
-      # 9️⃣ Subir artifacts Windows
+      # 9️⃣ Subir artifacts Windows (.exe / .msi)
       - name: Upload Windows artifacts
         if: matrix.platform == 'windows-latest'
         uses: actions/upload-artifact@v4
@@ -76,4 +92,3 @@ jobs:
             src-tauri/target/release/bundle/**/*.msi
             src-tauri/target/release/bundle/**/*.exe
         continue-on-error: true
-
